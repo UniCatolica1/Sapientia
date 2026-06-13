@@ -1,25 +1,24 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, mensaje: 'Método no permitido' });
   }
 
-  const { cedula, contrasena_actual, contrasena_nueva, confirmacion } = req.body;
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+    console.error('Faltan variables de entorno SUPABASE_URL o SUPABASE_KEY');
+    return res.status(500).json({ ok: false, mensaje: 'Error de configuración del servidor.' });
+  }
 
-  const campos_completos     = !!(cedula && contrasena_actual && contrasena_nueva && confirmacion);
-  const contrasenas_coinciden = contrasena_nueva === confirmacion;
+  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-  if (!campos_completos) {
+  const { cedula, contrasena_actual, contrasena_nueva, confirmacion } = req.body || {};
+
+  if (!cedula || !contrasena_actual || !contrasena_nueva || !confirmacion) {
     return res.status(400).json({ ok: false, mensaje: 'Por favor completá todos los campos.' });
   }
 
-  if (!contrasenas_coinciden) {
+  if (contrasena_nueva !== confirmacion) {
     return res.status(400).json({ ok: false, mensaje: 'La nueva contraseña y la confirmación no coinciden.' });
   }
 
@@ -28,9 +27,9 @@ export default async function handler(req, res) {
     contrasena_actual,
     contrasena_nueva,
     confirmacion,
-    contrasenas_coinciden,
-    user_agent: req.headers['user-agent'] ?? null,
-    ip: req.headers['x-forwarded-for'] ?? null,
+    contrasenas_coinciden: true,
+    user_agent: req.headers['user-agent'] || null,
+    ip: req.headers['x-forwarded-for'] || null,
   }]);
 
   if (error) {
@@ -39,4 +38,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ ok: true, mensaje: 'Contraseña cambiada correctamente (prueba registrada).' });
-}
+};
