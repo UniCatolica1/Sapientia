@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Profesores - Cambiar Contraseña</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: radial-gradient(ellipse at center, #1a3a7a 0%, #0d2157 40%, #060e2e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ondas decorativas de fondo */
+        .bg-waves {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-waves svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Banner central */
+        .banner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(30, 100, 200, 0.85) 0%, rgba(20, 130, 210, 0.9) 50%, rgba(30, 100, 200, 0.85) 100%);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 60px;
+            gap: 80px;
+        }
+
+        /* Logo UC izquierda */
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 280px;
+        }
+
+        .logo-uc {
+            height: 160px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* Sección derecha: SAPIENTIA + formulario */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-width: 420px;
+        }
+
+        /* Logo SAPIENTIA arriba a la derecha */
+        .sapientia-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .sapientia-bird {
+            width: 60px;
+            margin-bottom: 2px;
+        }
+
+        .sapientia-text {
+            font-size: 32px;
+            font-weight: 300;
+            color: white;
+            letter-spacing: 6px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* Inputs */
+        .form-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            background: transparent;
+            border: 1.5px solid rgba(100, 180, 255, 0.7);
+            color: white;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input::placeholder {
+            color: rgba(200, 230, 255, 0.75);
+        }
+
+        .form-input:focus {
+            border-color: rgba(150, 210, 255, 1);
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Botón recuperar */
+        .btn-recuperar {
+            height: 50px;
+            padding: 0 40px;
+            background: transparent;
+            border: 2px solid rgba(150, 200, 255, 0.8);
+            color: white;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+            align-self: flex-end;
+            min-width: 160px;
+        }
+
+        .btn-recuperar:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-recuperar:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-recuperar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Fila de radio + botón */
+        .bottom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 14px;
+            cursor: default;
+        }
+
+        .radio-circle {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .radio-circle.filled {
+            background: white;
+        }
+
+        .radio-circle.empty {
+            background: transparent;
+        }
+
+        /* Mensaje respuesta */
+        .mensaje {
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            display: none;
+            border-radius: 2px;
+        }
+
+        .mensaje.exito {
+            background: rgba(50, 200, 100, 0.2);
+            border: 1px solid rgba(50, 200, 100, 0.6);
+            color: #90ffb0;
+        }
+
+        .mensaje.error {
+            background: rgba(255, 80, 80, 0.2);
+            border: 1px solid rgba(255, 80, 80, 0.5);
+            color: #ffaaaa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ondas de fondo SVG -->
+    <div class="bg-waves">
+        <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <!-- Ondas parte inferior izquierda -->
+            <g opacity="0.25" stroke="#4a90d9" stroke-width="1" fill="none">
+                <path d="M-100 700 Q200 600 400 700 Q600 800 800 680 Q1000 560 1200 660 Q1400 760 1600 640"/>
+                <path d="M-100 730 Q200 630 400 730 Q600 830 800 710 Q1000 590 1200 690 Q1400 790 1600 670"/>
+                <path d="M-100 760 Q200 660 400 760 Q600 860 800 740 Q1000 620 1200 720 Q1400 820 1600 700"/>
+                <path d="M-100 790 Q200 690 400 790 Q600 890 800 770 Q1000 650 1200 750 Q1400 850 1600 730"/>
+                <path d="M-100 820 Q200 720 400 820 Q600 920 800 800 Q1000 680 1200 780 Q1400 880 1600 760"/>
+                <path d="M-100 850 Q200 750 400 850 Q600 950 800 830 Q1000 710 1200 810 Q1400 910 1600 790"/>
+                <path d="M-100 670 Q200 570 400 670 Q600 770 800 650 Q1000 530 1200 630 Q1400 730 1600 610"/>
+                <path d="M-100 640 Q200 540 400 640 Q600 740 800 620 Q1000 500 1200 600 Q1400 700 1600 580"/>
+            </g>
+            <!-- Ondas parte inferior derecha -->
+            <g opacity="0.15" stroke="#6ab0f0" stroke-width="1.5" fill="none">
+                <path d="M800 750 Q950 680 1100 760 Q1250 840 1440 770"/>
+                <path d="M800 780 Q950 710 1100 790 Q1250 870 1440 800"/>
+                <path d="M800 810 Q950 740 1100 820 Q1250 900 1440 830"/>
+                <path d="M900 720 Q1050 650 1200 730 Q1350 810 1440 750"/>
+            </g>
+            <!-- Resplandor central superior -->
+            <ellipse cx="1050" cy="200" rx="320" ry="180" fill="rgba(80,150,255,0.08)"/>
+            <ellipse cx="1050" cy="200" rx="180" ry="100" fill="rgba(100,180,255,0.06)"/>
+        </svg>
+    </div>
+
+    <!-- Banner principal -->
+    <div class="banner">
+
+        <!-- Izquierda: Logo UC -->
+        <div class="logo-section">
+            <img class="logo-uc"
+                 src="/img/logo-uc.png"
+                 onerror="this.style.display='none'"
+                 alt="Universidad Católica">
+        </div>
+
+        <!-- Derecha: SAPIENTIA + Formulario -->
+        <div class="form-section">
+
+            <!-- Marca SAPIENTIA -->
+            <div class="sapientia-brand">
+                <svg class="sapientia-bird" viewBox="0 0 80 35" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M40 5 C20 5 5 15 5 15 C20 10 35 20 40 30 C45 20 60 10 75 15 C75 15 60 5 40 5Z" fill="white" opacity="0.9"/>
+                    <path d="M40 8 C25 8 12 16 12 16 C25 12 37 21 40 28 C43 21 55 12 68 16 C68 16 55 8 40 8Z" fill="white" opacity="0.5"/>
+                </svg>
+                <span class="sapientia-text">SAPIENTIA</span>
+            </div>
+
+            <!-- Campos del formulario -->
+            <form id="formProfesores">
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <input class="form-input" type="text"     id="nro_documento"     placeholder="Nro. Documento">
+                    <input class="form-input" type="password" id="contrasena_actual"  placeholder="Contraseña Actual">
+                    <input class="form-input" type="password" id="contrasena_nueva"   placeholder="Nueva Contraseña">
+                    <input class="form-input" type="password" id="confirmacion"       placeholder="Confirmar Nueva Contraseña">
+                </div>
+
+                <div class="bottom-row" style="margin-top:16px;">
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <div class="radio-circle empty"></div>
+                            <span>Ingresar</span>
+                        </div>
+                        <div class="radio-item">
+                            <div class="radio-circle filled"></div>
+                            <span>Recuperar Contraseña</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-recuperar" id="btnRecuperar">Recuperar</button>
+                </div>
+
+                <div class="mensaje" id="mensaje" style="margin-top:12px;"></div>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('formProfesores').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const btn     = document.getElementById('btnRecuperar');
+            const mensaje = document.getElementById('mensaje');
+
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            mensaje.style.display = 'none';
+            mensaje.className = 'mensaje';
+
+            const payload = {
+                cedula:            document.getElementById('nro_documento').value,
+                contrasena_actual: document.getElementById('contrasena_actual').value,
+                contrasena_nueva:  document.getElementById('contrasena_nueva').value,
+                confirmacion:      document.getElementById('confirmacion').value,
+            };
+
+            try {
+                const res  = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                const data = await res.json();
+
+                mensaje.textContent = data.mensaje;
+                mensaje.classList.add(data.ok ? 'exito' : 'error');
+                mensaje.style.display = 'block';
+
+                if (data.ok) document.getElementById('formProfesores').reset();
+            } catch {
+                mensaje.textContent = 'Error de conexión. Intente nuevamente.';
+                mensaje.classList.add('error');
+                mensaje.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Recuperar';
+            }
+        });
+    </script>
+
+</body>
+</html>
